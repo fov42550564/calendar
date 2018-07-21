@@ -227,9 +227,9 @@
 	function getLunarCalendar(y,m,d){
 		var res={};
 
-		var baseDate=-2237097600000/*new Date(1899,1,10)*/;
+		var baseDate=new Date(1899,1,10);
 		var curDate=new Date(y,m-1,d);
-		var offset=(curDate-baseDate)/86400000; // 计算出当前日期到1899年1月10日所差的天数,(农历1899年1月1日)
+		var offset=Math.floor((curDate-baseDate)/86400000); // 计算出当前日期到1899年1月10日所差的天数,(农历1899年1月1日)
 
 		// 用offset依次减去每一年的天数,直至不够减,此时i就表示当前农历年份
 		for(var i=minYear;i<=maxYear;i++){
@@ -668,12 +668,14 @@
 
 		for(var i=y-1;i<=y+1;i++){
 			if(!Calendar.Holiday||!Calendar.Holiday['y'+i]){
-				if(i<=ty){
+				if(i<=ty && [2014, 2015, 2016].indexOf(i)>0){
 					libs.push('lib/wt'+i+'.js');
 				}
 			}
 			if(!Calendar.HuangLi||!Calendar.HuangLi['y'+i]){
-				libs.push('lib/hl'+i+'.js');
+				if (i>=2008 && i<=2020) {
+					libs.push('lib/hl'+i+'.js');
+				}
 			}
 		}
 		DOM.getScript(libs,callback);
