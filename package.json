@@ -4,6 +4,9 @@
   "description": "纯JavaScript万年历,无依赖",
   "author": "魏国兴",
   "keywords": "javascript,calendar,万年历",
+  "scripts": {
+      "build": "gulp"
+  },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
