@@ -1,206 +1,15 @@
 const fs = require('fs');
 const request = require('superagent');
 const chalk = require('chalk');
+const moment = require('moment');
+const _ = require('lodash');
 
-const DATA = {
-    "StdStg": 6018,
-    "StdStl": 8,
-    "_update_time": "1528094316",
-    "cambrian_appid": "0",
-    "loc": "https:\/\/ss1.baidu.com\/8aQDcnSm2Q5IlBGlnYG\/q?r=2002753&k=2016%E5%B9%B44%E6%9C%88",
-    "almanac": [{
-        "date": "2016-4-1",
-        "avoid": "纳采.动土.开市.交易.",
-        "suit": "开光.祈福.求嗣.出行.解除.伐木.造屋.起基.修造.架马.移徙.入宅.造庙.除服.成服.移柩.谢土.纳畜.牧养."
-    }, {
-        "date": "2016-4-2",
-        "avoid": "祭祀.嫁娶.出行.掘井.",
-        "suit": "裁衣.经络.伐木.开柱眼.拆卸.修造.动土.合脊.合寿木.入殓.除服.成服.移柩.破土.安葬.启攒.修坟.立碑."
-    }, {
-        "date": "2016-4-3",
-        "avoid": "栽种.动土.安葬.掘井.修坟.探病.",
-        "suit": "祭祀.会亲友.立券.交易.裁衣.合帐.嫁娶.冠笄.进人口."
-    }, {
-        "date": "2016-4-4",
-        "avoid": "开光.伐木.安葬.破土.",
-        "suit": "祭祀.出行.教牛马.扫舍.余事勿取."
-    }, {
-        "date": "2016-4-5",
-        "avoid": "修坟.造桥.作灶.出行.安葬.造屋.入宅.",
-        "suit": "祭祀.祈福.求嗣.开光.纳采.订盟.解除.栽种.纳畜.牧养.扫舍.进人口."
-    }, {
-        "date": "2016-4-6",
-        "avoid": "祈福.出火.置产.动土.破土.安葬.修造.上梁.置产.入宅.",
-        "suit": "开光.出行.交易.塞穴.嫁娶.理发.开市.安床."
-    }, {
-        "date": "2016-4-7",
-        "avoid": "嫁娶.安床.治病.",
-        "suit": "祭祀.作灶.畋猎.结网.修饰垣墙.平治道涂.余事勿取."
-    }, {
-        "date": "2016-4-8",
-        "avoid": "斋醮.开光.嫁娶.入宅.上梁.",
-        "suit": "沐浴.祭祀.解除.安葬.破土.谢土.移柩.余事勿取."
-    }, {
-        "date": "2016-4-9",
-        "avoid": "动土.破土.",
-        "suit": "祭祀.解除.入殓.移柩.启攒.安葬.整手足甲.捕捉.畋猎.取渔.除服.成服.扫舍.谢土.斋醮."
-    }, {
-        "date": "2016-4-10",
-        "avoid": "嫁娶.开市.",
-        "suit": "祭祀.沐浴.解除.破屋.坏垣.求医.治病.余事勿取."
-    }, {
-        "date": "2016-4-11",
-        "avoid": "祈福.安葬.",
-        "suit": "沐浴.塞穴.畋猎.结网.取渔.扫舍.余事勿取."
-    }, {
-        "date": "2016-4-12",
-        "avoid": "纳采.问名.订盟.嫁娶.入宅.开仓.出火.动土.破土.纳畜.伐木.",
-        "suit": "开市.交易.立券.挂匾.祭祀.开光.祈福.求嗣.安床.解除.修造.安葬."
-    }, {
-        "date": "2016-4-13",
-        "avoid": "嫁娶.入宅.",
-        "suit": "祭祀.修门.取渔.纳财.纳畜.余事勿取."
-    }, {
-        "date": "2016-4-14",
-        "avoid": "作灶.安葬.祭祀.入殓.",
-        "suit": "安香.出火.纳采.订盟.嫁娶.开市.立券.交易.挂匾.开光.出行.解除.安床.栽种.置产.拆卸.修造.动土."
-    }, {
-        "date": "2016-4-15",
-        "avoid": "入宅.作灶.理发.开光.安门.",
-        "suit": "祭祀.出行.修造.动土.合帐.造畜椆栖.安床.入殓.移柩.破土.启攒.安葬.开生坟.合寿木.补垣.塞穴."
-    }, {
-        "date": "2016-4-16",
-        "avoid": "开光.修造.动土.破土.",
-        "suit": "祭祀.修饰垣墙.余事勿取."
-    }, {
-        "date": "2016-4-17",
-        "avoid": "纳采.出行.修坟.安葬.开市.立券.作灶.",
-        "suit": "嫁娶.祭祀.祈福.求嗣.斋醮.开光.出火.移徙.入宅.竖柱.上梁.会亲友.造屋.起基.治病.治病.安门.造车器.掘井.开池."
-    }, {
-        "date": "2016-4-18",
-        "avoid": "祈福.入宅.造屋.动土.破土.探病.",
-        "suit": "祭祀.塑绘.开光.纳采.嫁娶.开市.出行.会亲友.安床.结网.除服.成服.启攒.安葬.移柩."
-    }, {
-        "date": "2016-4-19",
-        "avoid": "安床.入宅.安碓硙.栽种.",
-        "suit": "祭祀.作灶.平治道涂.余事勿取."
-    }, {
-        "date": "2016-4-20",
-        "avoid": "移徙.入宅.嫁娶.出行.安床.",
-        "suit": "祭祀.祈福.求嗣.斋醮.沐浴.纳畜.入殓.破土.安葬."
-    }, {
-        "date": "2016-4-21",
-        "avoid": "嫁娶.开市.纳财.出火.",
-        "suit": "纳采.祭祀.祈福.求嗣.斋醮.出行.起基.造屋.定磉.安门.入殓.安葬."
-    }, {
-        "date": "2016-4-22",
-        "avoid": "祈福.斋醮.开市.安葬.",
-        "suit": "祭祀.沐浴.解除.求医.治病.破屋.坏垣.余事勿取."
-    }, {
-        "date": "2016-4-23",
-        "avoid": "祭祀.嫁娶.入宅.作灶.安葬.",
-        "suit": "沐浴.捕捉.畋猎.结网.取渔."
-    }, {
-        "date": "2016-4-24",
-        "avoid": "出火.嫁娶.开市.",
-        "suit": "祭祀.祈福.求嗣.斋醮.纳采.订盟.开光.竖柱.上梁.开仓.出货财.造屋.起基.定磉.安门.诸事不宜.破土.入殓.启攒.谢土."
-    }, {
-        "date": "2016-4-25",
-        "avoid": "嫁娶.安葬.",
-        "suit": "祭祀.捕捉.解除.余事勿取."
-    }, {
-        "date": "2016-4-26",
-        "avoid": "祈福.动土.破土.安葬.入殓.",
-        "suit": "纳采.嫁娶.出行.开市.立券.纳畜.牧养.出火.移徙.入宅."
-    }, {
-        "date": "2016-4-27",
-        "avoid": "开光.嫁娶.掘井.安葬.安门.探病.",
-        "suit": "祭祀.祈福.求嗣.斋醮.冠笄.作灶.纳财.交易."
-    }, {
-        "date": "2016-4-28",
-        "avoid": "动土.破土.行丧.开光.作梁.安葬.探病.",
-        "suit": "祭祀.解除.教牛马.出行.余事勿取."
-    }, {
-        "date": "2016-4-29",
-        "avoid": "开市.嫁娶.移徙.入宅.掘井.安葬.",
-        "suit": "沐浴.斋醮.解除.求医.治病.会亲友.造畜椆栖.栽种.理发.扫舍."
-    }, {
-        "date": "2016-4-30",
-        "avoid": "祈福.修造.动土.破土.谢土.",
-        "suit": "求嗣.出行.解除.订盟.纳采.嫁娶.会亲友.进人口.安床.交易.纳畜.牧养.入殓.除服.成服.移柩.安葬.启攒."
-    }],
-    "url": "http:\/\/nourl.baidu.com\/6018",
-    "holidaylist": [{
-        "startday": "2016-1-1",
-        "name": "元旦"
-    }, {
-        "startday": "2016-2-7",
-        "name": "除夕"
-    }, {
-        "startday": "2016-2-7",
-        "name": "春节"
-    }, {
-        "startday": "2016-4-4",
-        "name": "清明节"
-    }, {
-        "startday": "2016-5-1",
-        "name": "劳动节"
-    }, {
-        "startday": "2016-6-9",
-        "name": "端午节"
-    }, {
-        "startday": "2016-9-15",
-        "name": "中秋节"
-    }, {
-        "startday": "2016-10-1",
-        "name": "国庆节"
-    }],
-    "key": "2016年4月",
-    "holiday": [{
-        "festival": "2016-4-4",
-        "list": [{
-            "date": "2016-4-2",
-            "status": "1"
-        }, {
-            "date": "2016-4-3",
-            "status": "1"
-        }, {
-            "date": "2016-4-4",
-            "status": "1"
-        }],
-        "list#num#baidu": 3,
-        "name": "清明节",
-        "desc": "4月4日放假，与周末连休。"
-    }, {
-        "festival": "2016-5-1",
-        "list": [{
-            "date": "2016-4-30",
-            "status": "1"
-        }, {
-            "date": "2016-5-1",
-            "status": "1"
-        }, {
-            "date": "2016-5-2",
-            "status": "1"
-        }],
-        "list#num#baidu": 3,
-        "name": "劳动节",
-        "desc": "5月1日放假，5月2日（星期一）补休。"
-    }],
-    "selectday": "2016-4-1",
-    "SiteId": 2002753,
-    "_version": 2181,
-    "_select_time": 1528093685,
-    "clicklimit": "1-3",
-    "ExtendedLocation": "",
-    "OriginQuery": "2016年4月",
-    "tplt": "calendar_new",
-    "resourceid": "6018",
-    "fetchkey": "6018_2016年4月",
-    "appinfo": "",
-    "role_id": 10,
-    "disp_type": 0
-};
+const HL_HEADER = `window.Calendar = window.Calendar||{};
+window.Calendar.HuangLi = window.Calendar.HuangLi || {};
+window.Calendar.HuangLi.y`;
+const WT_HEADER = `indow.Calendar = window.Calendar||{};
+window.Calendar.Holiday = window.Calendar.Holiday || {};
+window.Calendar.Holiday.y`;
 
 function showError (url, info) {
     console.error(chalk.red(url + ':' + info));
@@ -214,7 +23,6 @@ function getData (year, month) {
     return new Promise((resolve) => {
         const url = getURL(year, month);
         request.get(url).end((err, res) => {
-            console.log(err);
             if (err) {
                 showError(year, month, err.status);
             }
@@ -222,9 +30,46 @@ function getData (year, month) {
         });
     });
 }
+async function getYearData(year, holiday) {
+    console.log(`[start]: ${year}`);
+    const almanac = {};
+    const nextHoliday = {};
+    for (let m=1; m<=12; m++) {
+        console.log(`===[get]: ${year}-${m}`);
+        const data = await getData(year, m);
+        if (data.almanac) {
+            data.almanac.forEach(o=>{
+                const key = moment(new Date(o.date)).format('MMDD');
+                almanac[`d${key}`] = {y: o.suit, j: o.avoid};
+            });
+        }
+        if (data.holiday) {
+            !_.isArray(data.holiday) && (data.holiday = [data.holiday]);
+            [].concat(...data.holiday.map(o=>o.list)).forEach(o=>{
+                const _m = moment(new Date(o.date));
+                const key = _m.format('MMDD');
+                const _year = _m.format('YYYY');
+                if (_year*1 !== year*1) {
+                    nextHoliday[`d${key}`] = o.status*1;
+                } else {
+                    holiday[`d${key}`] = o.status*1;
+                }
+            });
+        }
+    }
+    fs.writeFileSync(`../lib/hl${year}.js`, `${HL_HEADER}${year} = ${JSON.stringify(almanac, null, 2)};`);
+    if (Object.keys(holiday).length > 0) {
+        fs.writeFileSync(`../lib/wt${year}.js`, `${WT_HEADER}${year} = ${JSON.stringify(holiday, null, 2)};`);
+    }
+    console.log(`[end]: ${year}`);
+    return nextHoliday;
+}
+
 async function main() {
-    const data = DATA; //await getData(2016, 4);
-    console.log(data);
+    let nextHoliday = {};
+    for (let y=2008; y<=2020; y++) {
+        nextHoliday = await getYearData(y, nextHoliday);
+    }
 }
 
 main();
