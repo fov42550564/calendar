@@ -196,7 +196,6 @@
 
 		 	// 获取某天的农历日期
 		 	elem.lunarCalendar=getLunarCalendar(year,month,day);
-			console.log("====",elem.lunarCalendar);
 		 	// 获取某天的天干地支
 		 	elem.chinaEra=getChinaEra(year,month,day);
 		 	// 获取某天的国际节日
@@ -248,7 +247,7 @@
 		// 此时offset为,当前日期到今年农历月份的天数,进而通过这个差值计算出对应的农历月份
 
 		// 当年闰月的月份
-		var leap=leapMonth(res.year);
+		var leap=getLunarLeapMonth(res.year);
 		var isLeap=false;
         //设定当年是否有闰月
         if(leap>0){
@@ -263,12 +262,12 @@
             if (isLeap&&(i==leap+1)&&(isLeapMonth==false)){
                 isLeapMonth=true;
                 i--;
-                days=leapDays(res.year);
+                days=getLunarLeapDays(res.year);
 
             // 如果没有闰月则减去正常月天数
             }else{
                 isLeapMonth=false;
-                days=monthDays(res.year,i);
+                days=getLunarMonthDays(res.year,i);
             }
 			// 如果offset-days小于0了说明,offset找到对应月份
             if(offset-days<0) break;
@@ -340,7 +339,7 @@
 		function offsetDays(y,m,d){
 
 			// 当年闰月的月份
-			var leap=leapMonth(y);
+			var leap=getLunarLeapMonth(y);
 			 //设定当年是否有闰月
 			var isLeap=false;
 	        if(leap>0){
@@ -354,12 +353,12 @@
 	            if (isLeap&&(i==leap+1)&&(isLeapMonth==false)){
 	                isLeapMonth=true;
 	                i--;
-	                days=leapDays(y);
+	                days=getLunarLeapDays(y);
 
 	            // 如果没有闰月则减去正常月天数
 	            }else{
 	                isLeapMonth=false;
-	                days=monthDays(y,i);
+	                days=getLunarMonthDays(y,i);
 	            }
 
 				offset+=days;
@@ -370,7 +369,7 @@
 			res.push(offset);
 			// 如果当前月就是闰月,就会存在2个offset
 			if(m==leap){
-				res.push(offset+leapDays(y));
+				res.push(offset+getLunarLeapDays(y));
 			}
 
 			return res;
@@ -386,7 +385,7 @@
 	 * 返回y年农历的中闰月,如果y年没有闰月返回0
 	 * @param {Number} y 年
 	 */
-	function leapMonth(y) {
+	function getLunarLeapMonth(y) {
 		return (lunarInfo[y-1899]&0x0000f);
 	}
 
@@ -394,8 +393,8 @@
 	 * 返回y年农历的中闰月的天数
 	 * @param {Number} y 年
 	 */
-	function leapDays(y) {
-		if (leapMonth(y)) {
+	function getLunarLeapDays(y) {
+		if (getLunarLeapMonth(y)) {
 			return ((lunarInfo[y-1899]&0x10000)?30:29);
 		} else {
 			return 0;
@@ -406,7 +405,7 @@
 	 * 返回y年农历的指定月份的天数
 	 * @param {Number} y 年
 	 */
-	function monthDays(y,m) {
+	function getLunarMonthDays(y,m) {
 		return ((lunarInfo[y-1899]&(0x10000>>m))?30:29);
 	}
 	/**
@@ -418,7 +417,54 @@
 		for (i=0x08000;i>0x00008;i>>=1) {
 			sum+=(lunarInfo[y-1899]&i)?30:29;
 		}
-		return (sum+leapDays(y)); // y年的天数再加上当年闰月的天数
+		return (sum+getLunarLeapDays(y)); // y年的天数再加上当年闰月的天数
+	}
+
+	/**
+	 * 某年的第n个节气为几日
+	 * 地球公转时间:31556925974.7 毫秒
+	 * 由于农历24节气交节时刻采用近似算法,可能存在少量误差(30分钟内)
+	 * 1900年的正小寒点：01-06 02:03:57,1900年为基准点
+	 *
+	 * @param {Number} y 公历年
+	 * @param {Number} n 第几个节气，从0小寒起算
+	 *
+	 */
+	function getTerm(y,n) {
+		var offDate = new Date((31556925974.7*(y-1900)+termInfo[n]*60000)+Date.UTC(1900,0,6,2,3,57));
+		return(offDate.getUTCDate());
+	}
+
+	/**
+	 * 获取公历年一年的二十四节气
+	 * 返回节气中文名
+	 */
+	function getYearTerm(y,m,d){
+		var res=null;
+		var month=0;
+		for(var i=0;i<24;i++){
+			var day=getTerm(y,i);
+			if(i%2==0) month++
+			if(month==m&&day==d){
+				res=solarTerm[i];
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * 获取某一年讴歌节气的日期
+	 * 返回日期
+	 */
+	function getDayOfTerm(y, index){
+		var month=0;
+		for(var i=0;i<24;i++){
+			var day=getTerm(y,i);
+			if(i%2==0) month++
+			if(i===index){
+				return {month, day};
+			}
+		}
 	}
 
 
@@ -490,36 +536,6 @@
 			 var num=y-1900+35; //参考干支纪年的计算，生肖对应地支
 			 return chinaZodiac[num%12];
 		}
-		/**
-		 * 某年的第n个节气为几日
-		 * 地球公转时间:31556925974.7 毫秒
-		 * 由于农历24节气交节时刻采用近似算法,可能存在少量误差(30分钟内)
-		 * 1900年的正小寒点：01-06 02:03:57,1900年为基准点
-		 *
-		 * @param {Number} y 公历年
-		 * @param {Number} n 第几个节气，从0小寒起算
-		 *
-		 */
-		function getTerm(y,n) {
-			var offDate = new Date((31556925974.7*(y-1900)+termInfo[n]*60000)+Date.UTC(1900,0,6,2,3,57));
-			return(offDate.getUTCDate());
-		}
-		/**
-		 * 获取公历年一年的二十四节气
-		 * 返回节气中文名
-		 */
-		function getYearTerm(y,m,d){
-			var res=null;
-			var month=0;
-			for(var i=0;i<24;i++){
-				var day=getTerm(y,i);
-				if(i%2==0) month++
-				if(month==m&&day==d){
-					res=solarTerm[i];
-				}
-			}
-			return res;
-		}
 		return res;
 	}
 
@@ -552,9 +568,7 @@
 	 *
 	 * 根据日期获取某天的国内节日
 	 *
-	 * @param {Number} ly 年
-	 * @param {Number} lm 月
-	 * @param {Number} ld 日
+	 * @param {Object} lunar 农历日期
 	 */
 	function getDomesticFestival(lunar){
 		var ly = lunar.lunarYear;
@@ -699,6 +713,8 @@
 	Calendar.getLunarCalendar=getLunarCalendar; // 根据农历日期获取到公历日期
 	Calendar.debugCalendar=debugCalendar;       // 根据公历历日期获取到农历日期
 	Calendar.loadCalendarLib=loadCalendarLib;   // 加载lib文件(黄历和放假安排)
+	Calendar.getLunarMonthDays=getLunarMonthDays;   // 获取农历的某月的天数
+	Calendar.getDayOfTerm=getDayOfTerm;   // 获取节气对应的日期
 
 
 

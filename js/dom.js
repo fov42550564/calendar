@@ -194,6 +194,35 @@
 	}
 
 	/**
+	 * 国内放假节日
+	 * @param {Number} y
+	 * @param {Number} m
+	 */
+	function getFestivalList(y){
+		var obj = Calendar.getSolarCalendar(y, 1, 0)[0]; //获取除夕的日期
+		var m = obj.month;
+		var d = obj.day;
+		m=m<10?'0'+m:m;
+		d=d<10?'0'+d:d;
+		var obj1 = Calendar.getDayOfTerm(y, 6); //获取清明的日期
+		var m1 = obj1.month;
+		var d1 = obj1.day;
+		m1=m1<10?'0'+m1:m1;
+		d1=d1<10?'0'+d1:d1;
+		return {
+			'default':'假期安排',
+			'i0101':'元旦',
+			[`i${m}${d}`]:'除夕',
+			'd0101':'春节',
+			[`i${m1}${d1}`]:'清明节',
+			'i0501':'劳动节',
+			'd0505':'端午节',
+			'd0815':'中秋节',
+			'i1001':'国庆节'
+		};
+	}
+
+	/**
 	 * 初始化年月,节日选择控件
 	 * @param {Number} y
 	 * @param {Number} m
@@ -206,18 +235,6 @@
 		var minYear = 1899;//最小年限
 		var maxYear = 2100;//最大年限
 
-		// 国内放假节日
-		var festival={
-			'default':'假期安排',
-			'i0101':'元旦',
-			'xxxxx':'除夕',
-			'd0101':'春节',
-	        'xxxxx':'清明节',
-	        'i0501':'劳动节',
-	        'd0505':'端午节',
-	        'd0815':'中秋节',
-	        'i1001':'国庆节'
-		};
 		var html='';
 		for(var i=minYear+1;i<maxYear;i++){
 			html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="y">'+i+'年</li>';
@@ -237,6 +254,7 @@
 		$('.op-calendar-new-month-box .c-dropdown2-menubox').html(html);
 
 		var html='';
+		var festival = getFestivalList(y);
 		for(var i in festival){
 			html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="f">'+festival[i]+'</li>';
 		}
