@@ -159,6 +159,9 @@
 		dtmpl+='<p class="op-calendar-new-right-almanac c-clearfix">';
 		dtmpl+='<span class="op-calendar-new-right-suit"><i>宜</i><%=yDay%></span>';
 		dtmpl+='<span class="op-calendar-new-right-avoid"><i>忌</i><%=jDay%></span></p>';
+		dtmpl+='<%if(yDays||jDays)%><p class="op-calendar-hover-almanac"><span class="op-calendar-almanac-arrow">◆</span>';
+		dtmpl+='<span class="op-calendar-hover-suit"><i>宜</i><%=yDays%></span>';
+		dtmpl+='<span class="op-calendar-hover-avoid c-gap-top"><i>忌</i><%=jDays%></span></p>';
 		dtmpl+='</div>';
 
 
@@ -173,8 +176,10 @@
 		m=m<10?'0'+m:m;
 		d=d<10?'0'+d:d;
 
-		var yDay=selectedDay.almanac?selectedDay.almanac.y.split('.').slice(0,6).join('<br>'):'无';
-		var jDay=selectedDay.almanac?selectedDay.almanac.j.split('.').slice(0,6).join('<br>'):'无';
+		var yDay=selectedDay.almanac?selectedDay.almanac.y.split('.').slice(0,5).join('<br>'):'';
+		var jDay=selectedDay.almanac?selectedDay.almanac.j.split('.').slice(0,5).join('<br>'):'';
+		var yDays=selectedDay.almanac?selectedDay.almanac.y.split('.').filter(function(o){return o}).join('、'):undefined;
+		var jDays=selectedDay.almanac?selectedDay.almanac.j.split('.').filter(function(o){return o}).join('、'):undefined;
 		var day={
 			today:y+'-'+m+'-'+d,
 			dayTime:d,
@@ -186,11 +191,30 @@
 			eraDay:selectedDay.chinaEra.day,
 			zodiac:selectedDay.chinaEra.zodiac,
 			yDay:yDay,
-			jDay:jDay
+			jDay:jDay,
+			yDays:yDays,
+			jDays:jDays
 		}
 		dtmpl=$.template(dtmpl,day);
 		$('.op-calendar-new-right').html(dtmpl);
 
+		// 显示全部黄历
+		if (yDays || jDays) {
+			var almanacBox = $('.op-calendar-new-right-almanacbox');
+			var timer1;
+			almanacBox.on('mouseover',function(event){
+				clearTimeout(timer1),
+				timer1 = setTimeout(function() {
+					almanacBox.addClass("op-calendar-new-right-hover");
+				}, 300);
+			});
+			almanacBox.on('mouseout',function(event){
+				clearTimeout(timer1),
+				timer1 = setTimeout(function() {
+					almanacBox.removeClass("op-calendar-new-right-hover")
+				}, 100);
+			});
+		}
 	}
 
 	/**
@@ -349,7 +373,7 @@
 
 		// 初始化日历
 		Calendar.UI.calendarHTML(y,m);
-		// Calendar.UI.detailHTML(y,m,d);
+		Calendar.UI.detailHTML(y,m,d);
 	}
 
 }(Calendar,DOM);
