@@ -44,8 +44,9 @@
 			dtmpl+='<a class="<%=dateClass%>" href="javascript:;" date="<%=dateDay%>" data-othermonth="<%=othermonth%>">';
 			dtmpl+='<span class="op-calendar-new-daynumber"><%=solarDay%></span>';
 			dtmpl+='<span class="op-calendar-new-table-almanac"><%=lunarDay%></span>';
-			dtmpl+='<%if(rest)%><span class="op-calendar-new-table-holiday-sign">休</span> </a>';
-		    dtmpl+='</div></td>';
+			dtmpl+='<%if(rest==1)%><span class="op-calendar-new-table-holiday-sign">休</span>';
+			dtmpl+='<%if(rest==2)%><span class="op-calendar-new-table-holiday-sign">班</span>';
+		    dtmpl+='</a></div></td>';
 
 	    /**
 	     *
@@ -59,6 +60,7 @@
 	    	relative:'op-calendar-new-relative',
 	    	weekend:'op-calendar-new-table-weekend',
 	    	festival:'op-calendar-new-table-festival',
+	    	work:'op-calendar-new-table-work',
 	    	rest:'op-calendar-new-table-rest',
 	    	today:'op-calendar-new-table-today',
 	    	selected:'op-calendar-new-table-selected',
@@ -102,8 +104,10 @@
 					dateClass+=' '+dateClasses['weekend'];
 				}
 				// 休息
-				if(legalHoliday){
+				if(legalHoliday === 1){
 					dateClass+=' '+dateClasses['rest'];
+				} else if(legalHoliday === 2){
+					dateClass+=' '+dateClasses['work'];
 				}
 				// 假日
 				if(term||interFestival||domesticFestival){
@@ -202,22 +206,17 @@
 		var minYear = 1899;//最小年限
 		var maxYear = 2100;//最大年限
 
-		// 国内传统节日
+		// 国内放假节日
 		var festival={
 			'default':'假期安排',
-			'i0101':'元旦 ',
-			'd0101':'春节 ',
-	        'd0115':'元宵节',
-	        'd0202':'龙头节',
+			'i0101':'元旦',
+			'xxxxx':'除夕',
+			'd0101':'春节',
+	        'xxxxx':'清明节',
+	        'i0501':'劳动节',
 	        'd0505':'端午节',
-	        'd0707':'七夕节',
-	        'd0715':'中元节',
 	        'd0815':'中秋节',
-	        'd0909':'重阳节',
-	        'd1001':'寒衣节',
-	        'd1015':'下元节',
-	        'd1208':'腊八节',
-	        'd1223':'小年'
+	        'i1001':'国庆节'
 		};
 		var html='';
 		for(var i=minYear+1;i<maxYear;i++){
@@ -332,7 +331,7 @@
 
 		// 初始化日历
 		Calendar.UI.calendarHTML(y,m);
-		Calendar.UI.detailHTML(y,m,d);
+		// Calendar.UI.detailHTML(y,m,d);
 	}
 
 }(Calendar,DOM);

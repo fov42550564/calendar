@@ -196,12 +196,13 @@
 
 		 	// 获取某天的农历日期
 		 	elem.lunarCalendar=getLunarCalendar(year,month,day);
+			console.log("====",elem.lunarCalendar);
 		 	// 获取某天的天干地支
 		 	elem.chinaEra=getChinaEra(year,month,day);
 		 	// 获取某天的国际节日
 		 	elem.interFestival=getInterFestival(year,month,day);
 		 	// 获取某天的国内节日
-		 	elem.domesticFestival=getDomesticFestival(elem.lunarCalendar.lunarYear,elem.lunarCalendar.lunarMonth,elem.lunarCalendar.lunarDay);
+		 	elem.domesticFestival=getDomesticFestival(elem.lunarCalendar);
 		 	// 获取某天的放假安排
 		 	elem.legalHoliday=getLegalHoliday(year,month,day);
 		 	// 获取弄天的黄历信息
@@ -254,8 +255,9 @@
             isLeap=true;
         }
         isLeapMonth=false;
+		var days;
         for(var i=1;i<=12;i++){
-            var days=null;
+            days=null;
 
             //如果有闰月则减去闰月对应的天数
             if (isLeap&&(i==leap+1)&&(isLeapMonth==false)){
@@ -278,6 +280,7 @@
 
 		res.lunarMonth=i;
 		res.lunarDay=offset+1;
+		res.maxLunarDay=days;
 
 		return res;
 	}
@@ -549,14 +552,21 @@
 	 *
 	 * 根据日期获取某天的国内节日
 	 *
-	 * @param {Number} y 年
-	 * @param {Number} m 月
-	 * @param {Number} d 日
+	 * @param {Number} ly 年
+	 * @param {Number} lm 月
+	 * @param {Number} ld 日
 	 */
-	function getDomesticFestival(y,m,d){
-		m=m<10?'0'+m:m;
-		d=d<10?'0'+d:d;
-		return domesticFestival['d'+m+d]?domesticFestival['d'+m+d]:null;
+	function getDomesticFestival(lunar){
+		var ly = lunar.lunarYear;
+		var lm = lunar.lunarMonth;
+		var ld = lunar.lunarDay;
+		var md = lunar.maxLunarDay;
+		lm=lm<10?'0'+lm:lm;
+		ld=ld<10?'0'+ld:ld;
+		if (lm === 12 && ld === md) { //计算除夕
+			return '除夕';
+		}
+		return domesticFestival['d'+lm+ld]?domesticFestival['d'+lm+ld]:null;
 	}
 	/**
 	 *
@@ -572,7 +582,7 @@
 
 		var Calendar=window.Calendar;
 		if(Calendar.Holiday&&Calendar.Holiday['y'+y]){ //该年已有黄历数据
-			return Calendar.Holiday['y'+y]['d'+m+d]?Calendar.Holiday['y'+y]['d'+m+d]:null;
+			return Calendar.Holiday['y'+y]['d'+m+d] || null;
 		}
 
 	}
@@ -584,13 +594,13 @@
 	 * @param {Number} m 月
 	 * @param {Number} d 日
 	 */
-	function getAlmanac(y,m,d){
-		m=m<10?'0'+m:m;
-		d=d<10?'0'+d:d;
+	function getAlmanac(ly,lm,ld){
+		lm=lm<10?'0'+lm:lm;
+		ld=ld<10?'0'+ld:ld;
 
 		var Calendar=window.Calendar;
-		if(Calendar.HuangLi&&Calendar.HuangLi['y'+y]){ //该年已有黄历数据
-			return Calendar.HuangLi['y'+y]['d'+m+d]?Calendar.HuangLi['y'+y]['d'+m+d]:null;
+		if(Calendar.HuangLi&&Calendar.HuangLi['y'+ly]){ //该年已有黄历数据
+			return Calendar.HuangLi['y'+ly]['d'+lm+ld] || null;
 		}
 	}
 	/**
@@ -668,7 +678,7 @@
 
 		for(var i=y-1;i<=y+1;i++){
 			if(!Calendar.Holiday||!Calendar.Holiday['y'+i]){
-				if(i<=ty && [2014, 2015, 2016].indexOf(i)>0){
+				if(i<=ty && (i>=2011 && i<=2019)){
 					libs.push('lib/wt'+i+'.js');
 				}
 			}

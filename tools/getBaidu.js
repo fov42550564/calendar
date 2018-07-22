@@ -7,7 +7,7 @@ const _ = require('lodash');
 const HL_HEADER = `window.Calendar = window.Calendar||{};
 window.Calendar.HuangLi = window.Calendar.HuangLi || {};
 window.Calendar.HuangLi.y`;
-const WT_HEADER = `indow.Calendar = window.Calendar||{};
+const WT_HEADER = `window.Calendar = window.Calendar||{};
 window.Calendar.Holiday = window.Calendar.Holiday || {};
 window.Calendar.Holiday.y`;
 
