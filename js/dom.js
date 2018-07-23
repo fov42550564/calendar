@@ -289,6 +289,9 @@
 
 		// 设置当前选中的日期
 		$('.op-calendar-new-table-box').attr('date-selected',y+'-'+m+'-'+d);
+
+		// 设置滚动初始位置
+		$('.op-calendar-new-year-box .c-dropdown2-menu-inner').dom[0].scrollTop = 26*(y-1900);
 	}
 	/**
 	 * 更新输入框年月和当前选中的日期
