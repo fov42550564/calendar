@@ -261,7 +261,11 @@
 
 		var html='';
 		for(var i=minYear+1;i<maxYear;i++){
-			html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="y">'+i+'年</li>';
+			if (y === i) {
+				html+='<li class="c-dropdown2-option c-dropdown2-default" data-value="'+i+'" data-role="y">'+i+'年</li>';
+			} else {
+				html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="y">'+i+'年</li>';
+			}
 		}
 		// 输入框中的年
 		$('.op-calendar-new-year-box .c-dropdown2-btn').html(y+'年')
@@ -270,7 +274,11 @@
 
 		var html='';
 		for(var i=1;i<=12;i++){
-			html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="m">'+i+'月</li>';
+			if (m === i) {
+				html+='<li class="c-dropdown2-option c-dropdown2-default" data-value="'+i+'" data-role="m">'+i+'月</li>';
+			} else {
+				html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="m">'+i+'月</li>';
+			}
 		}
 		// 输入框中的月
 		$('.op-calendar-new-month-box .c-dropdown2-btn').html(m+'月');
@@ -280,7 +288,11 @@
 		var html='';
 		var festival = getFestivalList(y);
 		for(var i in festival){
-			html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="f">'+festival[i]+'</li>';
+			if ('default' === i) {
+				html+='<li class="c-dropdown2-option c-dropdown2-default" data-value="'+i+'" data-role="f">'+festival[i]+'</li>';
+			} else {
+				html+='<li class="c-dropdown2-option" data-value="'+i+'" data-role="f">'+festival[i]+'</li>';
+			}
 		}
 		// 输入框中的节日
 		$('.op-calendar-new-holiday-box .c-dropdown2-btn').html('假期安排');
@@ -319,6 +331,14 @@
 		// 当前选中的日期
 		var selected=$('.op-calendar-new-table-box').attr('date-selected');
 		selected=(selected&&selected.length>0)?selected.split('-')[2]:0;
+
+		// 设置默认选项
+		$('.op-calendar-new-year-box .c-dropdown2-option').removeClass('c-dropdown2-default');
+		$('.op-calendar-new-year-box .c-dropdown2-option[data-value="'+year+'"]').addClass('c-dropdown2-default');
+		$('.op-calendar-new-month-box .c-dropdown2-option').removeClass('c-dropdown2-default');
+		$('.op-calendar-new-month-box .c-dropdown2-option[data-value="'+month+'"]').addClass('c-dropdown2-default');
+		$('.op-calendar-new-holiday-box .c-dropdown2-option').removeClass('c-dropdown2-default');
+		$('.op-calendar-new-holiday-box .c-dropdown2-option[data-value="'+festival+'"]').addClass('c-dropdown2-default');
 
 		var res={
 			year:parseInt(year,10),
