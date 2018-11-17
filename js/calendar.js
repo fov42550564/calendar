@@ -693,12 +693,12 @@
 		for(var i=y-1;i<=y+1;i++){
 			if(!Calendar.Holiday||!Calendar.Holiday['y'+i]){
 				if(i<=ty && (i>=2011 && i<=2019)){
-					libs.push('lib/wt'+i+'.js');
+					libs.push('data/wt'+i+'.js');
 				}
 			}
 			if(!Calendar.HuangLi||!Calendar.HuangLi['y'+i]){
 				if (i>=2008 && i<=2020) {
-					libs.push('lib/hl'+i+'.js');
+					libs.push('data/hl'+i+'.js');
 				}
 			}
 		}

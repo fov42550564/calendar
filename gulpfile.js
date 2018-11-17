@@ -28,12 +28,11 @@ htmlreplace = require('gulp-html-replace');//替换HTML中的路径
 
 // 样式处理
 gulp.task('css', function () {
-    var cssSrc = './css/*.css',
+    var cssSrc = ['./css/reset.css', './css/calendar.css'],
     cssDst = './dist/css';
 
     gulp.src(cssSrc)
-    // .pipe(gulp.dest(cssDst))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(concat('calendar.min.css'))
     .pipe(minifycss())
     .pipe(gulp.dest(cssDst));
 });
@@ -52,16 +51,14 @@ gulp.task('js', function () {
     jsDst ='./dist/js';
 
     gulp.src(jsSrc)
-    .pipe(concat('calendar.js'))
-    // .pipe(gulp.dest(jsDst))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(concat('calendar.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest(jsDst));
 });
-// lib依赖库文件
-gulp.task('lib', function () {
-    var jsSrc = './lib/*.js',
-    jsDst ='./dist/lib';
+// data依赖库文件
+gulp.task('data', function () {
+    var jsSrc = './data/*.js',
+    jsDst ='./dist/data';
 
     gulp.src(jsSrc)
     .pipe(uglify())
@@ -75,7 +72,6 @@ gulp.task("html", function(){
 
     return gulp.src(htmlSrc)
     .pipe(htmlreplace({
-        'reset':'css/reset.min.css',
         'css':'css/calendar.min.css',
         'js': 'js/calendar.min.js'
     }))
@@ -89,7 +85,7 @@ gulp.task("html", function(){
 
 // 清空图片、样式、js
 gulp.task('clean', function() {
-    gulp.src(['./dist/*.html','./dist/css/*', './dist/lib/*','./dist/js/*','./dist/img/*'], {read: false})
+    gulp.src(['./dist/*.html','./dist/css/*', './dist/data/*','./dist/js/*','./dist/img/*'], {read: false})
     .pipe(clean());
 });
 
@@ -97,7 +93,7 @@ gulp.task('clean', function() {
 gulp.task('default', ['clean'], function(){
     // 延时500ms,清除目录有一定延时
     setTimeout(function(){
-        gulp.start('html','css','lib','img','js');
+        gulp.start('html','css','data','img','js');
     },500);
 });
 
@@ -121,9 +117,9 @@ gulp.task('watch',function(){
         gulp.watch('./js/*.js', function(){
             gulp.run('js');
         });
-        // 监听lib
-        gulp.watch('./lib/*.js', function(){
-            gulp.run('lib');
+        // 监听data
+        gulp.watch('./data/*.js', function(){
+            gulp.run('data');
         });
         // 监听html
         gulp.watch('./*.html', function(){

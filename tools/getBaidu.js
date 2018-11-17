@@ -57,9 +57,9 @@ async function getYearData(year, holiday) {
             });
         }
     }
-    fs.writeFileSync(`../lib/hl${year}.js`, `${HL_HEADER}${year} = ${JSON.stringify(almanac, null, 2)};`);
+    fs.writeFileSync(`../data/hl${year}.js`, `${HL_HEADER}${year} = ${JSON.stringify(almanac, null, 2)};`);
     if (Object.keys(holiday).length > 0) {
-        fs.writeFileSync(`../lib/wt${year}.js`, `${WT_HEADER}${year} = ${JSON.stringify(holiday, null, 2)};`);
+        fs.writeFileSync(`../data/wt${year}.js`, `${WT_HEADER}${year} = ${JSON.stringify(holiday, null, 2)};`);
     }
     console.log(`[end]: ${year}`);
     return nextHoliday;
