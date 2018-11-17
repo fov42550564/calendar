@@ -462,7 +462,7 @@
 			var day=getTerm(y,i);
 			if(i%2==0) month++
 			if(i===index){
-				return {month, day};
+				return {month:month, day:day};
 			}
 		}
 	}
