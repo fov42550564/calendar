@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>北京时间</title>
+	<style>
+	#op-beijingtime {
+		position: relative;
+		height: 105px
+	}
+	#op-beijingtime-box {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 65px;
+		padding: 18px 0 17px 51px;
+		color: #fff;
+		font-family: Microsoft Yahei;
+	}
+	#op-beijingtime-mark {
+		position: absolute;
+		left: 51px;
+		top: 18px
+	}
+	#op-beijingtime-hands {
+		position: relative;
+		display: block;
+		float: left;
+		margin-right: 20px
+	}
+	#op-beijingtime-box p {
+		float: left;
+		white-space: nowrap
+	}
+	#op-beijingtime-time {
+		margin: 0;
+		margin-right: 7px;
+		font-size: 55px;
+		line-height: 65px;
+		width: 228px;
+		letter-spacing: 1px
+	}
+	#op-beijingtime-time span {
+		position: relative;
+		top: -5px
+	}
+	#op-beijingtime-time #op-beijingtime-second {
+		top: 0;
+		font-size: 30px
+	}
+	#op-beijingtime-datebox {
+		padding-top: 6px
+	}
+	#op-beijingtime-datebox span {
+		display: block;
+		text-align: center
+	}
+	#op-beijingtime-datebox #op-beijingtime-week {
+		text-align: left;
+		font-size: 20px
+	}
+	#op-beijingtime-date {
+		font-size: 15px
+	}
+</style>
+</head>
+<body>
+	<div id="op-beijingtime">
+		<canvas id="op-beijingtime-background" width="538" height="100"></canvas>
+		<div id="op-beijingtime-box">
+			<canvas id="op-beijingtime-hands" width="65" height="65"></canvas>
+			<canvas id="op-beijingtime-mark" width="65" height="65"></canvas>
+			<p id="op-beijingtime-time"><span id="op-beijingtime-hour">00</span><span>:</span><span id="op-beijingtime-minute">00</span><span id="op-beijingtime-second">00</span></p>
+			<p id="op-beijingtime-datebox">
+				<span id="op-beijingtime-week">星期一</span>
+				<span id="op-beijingtime-date">2018年11月19日</span>
+			</p>
+		</div>
+	</div>
+	<script type="application/javascript">
+	var STAR_NUM = 200;
+	var lastNightStatus;
+
+	function isNight(date) {
+		var hour = date.getHours();
+		return !(hour >= 19 || hour <= 7);
+	}
+	function drawBackground(canvas, night) {
+		var ctx = canvas.getContext("2d");
+		var width = canvas.offsetWidth;
+		var height =  canvas.offsetHeight;
+
+		if (lastNightStatus != night) {
+			lastNightStatus = night,
+			ctx.clearRect(0, 0, width, height);
+			if (night) {
+				ctx.fillStyle = ctx.createLinearGradient(0, 0, 0, height);
+				ctx.fillStyle.addColorStop(0, "rgb(24, 50, 89)");
+				ctx.fillStyle.addColorStop(1, "rgb(52, 130, 186)");
+			} else {
+				ctx.fillStyle = ctx.createLinearGradient(0, 0, 0, height);
+				ctx.fillStyle.addColorStop(0, "#0067bf");
+				ctx.fillStyle.addColorStop(1, "#6eabe2");
+			}
+			ctx.fillRect(0, 0, width, height);
+			if (night) { // drawStar
+				var i, x, y, radGrd, radius, startColor, opacity, unit;
+				for (unit = 1, i = 0; i < STAR_NUM; i++) {
+					x = Math.random() * width;
+					y = Math.random() * height;
+					radius = Math.random() + unit;
+					opacity = radius - unit;
+					opacity /= 2;
+					radGrd = ctx.createRadialGradient(x, y, 1, x, y, radius);
+					radGrd.addColorStop(0, "rgba( 175, 175, 175, " + opacity + " )");
+					radGrd.addColorStop(1, "rgba( 175, 175, 175, 0 )");
+					ctx.fillStyle = radGrd;
+					ctx.beginPath();
+					ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+					ctx.fill();
+					ctx.closePath();
+				}
+			}
+		}
+	}
+	function drawMark(canvas) {
+		var ctx = canvas.getContext("2d");
+		var radius = canvas.offsetWidth / 2;
+		ctx.translate(radius, radius);
+		for (var i = 0; i < 60; i++) {
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = "rgba( 255, 255, 255, 0.3 )";
+			ctx.strokeStyle = "#fff";
+			ctx.beginPath();
+			ctx.moveTo(0, ((i % 5 == 0) ? 8 :4) - radius);
+			ctx.lineTo(0, -radius);
+			ctx.stroke();
+			ctx.closePath();
+			ctx.rotate(Math.PI / 30);
+		}
+	}
+	function drawHands(canvas, date) {
+		var hour = date.getHours();
+		var minute = date.getMinutes();
+		var second = date.getSeconds();
+		var ctx = canvas.getContext("2d");
+		var radius = canvas.offsetWidth / 2;
+		hour > 12 && (hour -= 12);
+		hour += minute / 60;
+		minute += second / 60;
+		ctx.clearRect(0, 0, 2 * radius, 2 * radius);
+		var draw = function(lineWidth, strokeStyle, rotate, start, end) {
+			ctx.save();
+			ctx.lineWidth = lineWidth;
+			ctx.strokeStyle = strokeStyle;
+			ctx.translate(radius, radius);
+			ctx.rotate(rotate);
+			ctx.beginPath();
+			ctx.moveTo(0, start);
+			ctx.lineTo(0, end);
+			ctx.stroke();
+			ctx.closePath();
+			ctx.restore();
+		};
+		draw(3, "#fff", Math.PI / 6 * hour, 6, -16);
+		draw(2, "#fff", Math.PI / 30 * minute, 6, -24);
+		draw(1, "#d93c3c", Math.PI / 30 * second, 6, -24);
+	}
+	function setHtml(date, flag) {
+		if (flag & 1) {
+			var second = date.getSeconds();
+			document.getElementById("op-beijingtime-second").innerHTML = (second<10)?"0"+second:second;
+		}
+		if (flag & 2) {
+			var minute = date.getMinutes();
+			document.getElementById("op-beijingtime-minute").innerHTML = (minute<10)?"0"+minute:minute;
+		}
+		if (flag & 4) {
+			var hour = date.getHours();
+			document.getElementById("op-beijingtime-hour").innerHTML = (hour<10)?"0"+hour:hour;
+		}
+		if (flag & 8) {
+			var day = date.getDay();
+			var year = date.getFullYear();
+			var month = date.getMonth();
+			var date = date.getDate();
+			document.getElementById("op-beijingtime-week").innerHTML = "星期"+"日一二三四五六"[day];
+			document.getElementById("op-beijingtime-date").innerHTML = year+"年"+((month<10)?"0"+month:month)+"月"+((date<10)?"0"+date:date)+"日";
+		}
+	}
+
+	var bgCanvas = document.getElementById("op-beijingtime-background");
+	var markCanvas = document.getElementById("op-beijingtime-mark");
+	var handsCanvas = document.getElementById("op-beijingtime-hands");
+	var now = new Date();
+
+	setHtml(now, 15);
+	drawBackground(bgCanvas, isNight(now));
+	drawMark(markCanvas);
+	drawHands(handsCanvas, now);
+
+	var secondTimer = window.setInterval(function() {
+		now = new Date(now.getTime() + 1000);
+		if (0 == now.getSeconds()) {
+			now = new Date();
+			drawBackground(bgCanvas, isNight(now));
+			if (0 == now.getMinutes()) {
+				setHtml(now, 15);
+			} else {
+				setHtml(now, 3);
+			}
+		} else {
+			setHtml(now, 1);
+		}
+		drawHands(handsCanvas, now);
+	}, 1000);
+</script>
+</body>
+</html>
