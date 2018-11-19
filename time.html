@@ -83,7 +83,7 @@
 
 	function isNight(date) {
 		var hour = date.getHours();
-		return !(hour >= 19 || hour <= 7);
+		return hour >= 19 || hour <= 7;
 	}
 	function drawBackground(canvas, night) {
 		var ctx = canvas.getContext("2d");
