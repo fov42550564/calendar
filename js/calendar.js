@@ -205,7 +205,7 @@
 		 	// 获取某天的放假安排
 		 	elem.legalHoliday=getLegalHoliday(year,month,day);
 		 	// 获取弄天的黄历信息
-		 	elem.almanac=getAlmanac(elem.lunarCalendar.lunarYear,elem.lunarCalendar.lunarMonth,elem.lunarCalendar.lunarDay);
+		 	elem.almanac=getAlmanac(year,month,day);
 
 		 }
 
@@ -526,7 +526,7 @@
 		 * @param {Number} d 日
 		 */
         function getEraDay(y,m,d) {
-            return calculate(Math.ceil((new Date(y,m-1,d)-new Date(1900,0,1))/86400000+10));// 甲戌
+            return calculate(Math.floor((new Date(y,m-1,d)-new Date(1900,0,1))/86400000+10));// 甲戌
         }
         /**
 		 * 获取生肖
@@ -536,6 +536,7 @@
 			 var num=y-1900+35; //参考干支纪年的计算，生肖对应地支
 			 return chinaZodiac[num%12];
 		}
+		console.log(res);
 		return res;
 	}
 
@@ -608,13 +609,13 @@
 	 * @param {Number} m 月
 	 * @param {Number} d 日
 	 */
-	function getAlmanac(ly,lm,ld){
-		lm=lm<10?'0'+lm:lm;
-		ld=ld<10?'0'+ld:ld;
+	function getAlmanac(y,m,d){
+		m=m<10?'0'+m:m;
+		d=d<10?'0'+d:d;
 
 		var Calendar=window.Calendar;
-		if(Calendar.HuangLi&&Calendar.HuangLi['y'+ly]){ //该年已有黄历数据
-			return Calendar.HuangLi['y'+ly]['d'+lm+ld] || null;
+		if(Calendar.HuangLi&&Calendar.HuangLi['y'+y]){ //该年已有黄历数据
+			return Calendar.HuangLi['y'+y]['d'+m+d] || null;
 		}
 	}
 	/**

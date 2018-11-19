@@ -164,18 +164,15 @@
 		dtmpl+='<span class="op-calendar-hover-avoid c-gap-top"><i>忌</i><%=jDays%></span></p>';
 		dtmpl+='</div>';
 
-
+		var selectedDay=month[0];
 		for(var i in month){
-			var dateDay=month[i].solarCalendar.year+'-'+month[i].solarCalendar.month+'-'+month[i].solarCalendar.day;
-			if(dateDay===y+'-'+m+'-'+d){
+			selectedDay =  month[i];
+			if(selectedDay.solarCalendar.year === y && selectedDay.solarCalendar.month === m && selectedDay.solarCalendar.day === d){
 				break;
 			}
 		}
-		var selectedDay=month[i];
-
 		m=m<10?'0'+m:m;
 		d=d<10?'0'+d:d;
-
 		var yDay=selectedDay.almanac?selectedDay.almanac.y.split('.').slice(0,5).join('<br>'):'';
 		var jDay=selectedDay.almanac?selectedDay.almanac.j.split('.').slice(0,5).join('<br>'):'';
 		var yDays=selectedDay.almanac?selectedDay.almanac.y.split('.').filter(function(o){return o}).join('、'):undefined;
