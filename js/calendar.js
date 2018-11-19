@@ -681,29 +681,6 @@
 			}
 		}
 	}
-	// 加载依赖库文件
-	function loadCalendarLib(y,callback){
-
-		var today=new Date();
-		var ty=today.getFullYear();
-
-		var y=parseInt(y,10);
-		var libs=[];
-
-		for(var i=y-1;i<=y+1;i++){
-			if(!Calendar.Holiday||!Calendar.Holiday['y'+i]){
-				if(i<=ty && (i>=2011 && i<=2019)){
-					libs.push('data/wt'+i+'.js');
-				}
-			}
-			if(!Calendar.HuangLi||!Calendar.HuangLi['y'+i]){
-				if (i>=2008 && i<=2020) {
-					libs.push('data/hl'+i+'.js');
-				}
-			}
-		}
-		DOM.getScript(libs,callback);
-	}
 
 	// 定义全局命名空间Calendar
 	window.Calendar=window.Calendar||{};
@@ -712,7 +689,6 @@
 	Calendar.getSolarCalendar=getSolarCalendar; // 根据农历日期获取到公历日期
 	Calendar.getLunarCalendar=getLunarCalendar; // 根据农历日期获取到公历日期
 	Calendar.debugCalendar=debugCalendar;       // 根据公历历日期获取到农历日期
-	Calendar.loadCalendarLib=loadCalendarLib;   // 加载lib文件(黄历和放假安排)
 	Calendar.getLunarMonthDays=getLunarMonthDays;   // 获取农历的某月的天数
 	Calendar.getDayOfTerm=getDayOfTerm;   // 获取节气对应的日期
 

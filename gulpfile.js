@@ -47,20 +47,11 @@ gulp.task('img', function(){
 
 // js处理
 gulp.task('js', function () {
-    var jsSrc = './js/*.js',
+    var jsSrc = ['./data/*.js','./js/*.js'],
     jsDst ='./dist/js';
 
     gulp.src(jsSrc)
     .pipe(concat('calendar.min.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest(jsDst));
-});
-// data依赖库文件
-gulp.task('data', function () {
-    var jsSrc = './data/*.js',
-    jsDst ='./dist/data';
-
-    gulp.src(jsSrc)
     .pipe(uglify())
     .pipe(gulp.dest(jsDst));
 });
@@ -93,37 +84,6 @@ gulp.task('clean', function() {
 gulp.task('default', ['clean'], function(){
     // 延时500ms,清除目录有一定延时
     setTimeout(function(){
-        gulp.start('html','css','data','img','js');
+        gulp.start('html','css','img','js');
     },500);
-});
-
-// 监听任务 运行语句 gulp watch
-gulp.task('watch',function(){
-
-    server.listen(port, function(err){
-        if (err) {
-            return console.log(err);
-        }
-
-        // 监听css
-        gulp.watch('./css/*.css', function(){
-            gulp.run('css');
-        });
-        // 监听images
-        gulp.watch('./img/*', function(){
-            gulp.run('images');
-        });
-        // 监听js
-        gulp.watch('./js/*.js', function(){
-            gulp.run('js');
-        });
-        // 监听data
-        gulp.watch('./data/*.js', function(){
-            gulp.run('data');
-        });
-        // 监听html
-        gulp.watch('./*.html', function(){
-            gulp.run('html');
-        });
-    });
 });

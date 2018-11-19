@@ -201,43 +201,6 @@
 	 	}
 	}
 
-	// 动态加载JS
-	function getScript(urls,callback){
-
-		var head = document.getElementsByTagName('head')[0];
-		urls=typeof urls==='string'?[urls]:urls.concat();
-
-		if(urls.length<=0){
-			callback();
-		}
-
-		for(var i in urls){
-	        var js = document.createElement('script');
-	        js.setAttribute('type', 'text/javascript');
-	        js.setAttribute('src', urls[i]);
-        	head.appendChild(js);
-        	if(document.all){ //IE
-	            js.onreadystatechange=function(){
-	                if (js.readyState=='loaded'||js.readyState=='complete'){
-
-	                    (i==urls.length-1)&&callback();
-	                }
-	            }
-	            js.onerror=function(){
-					 (i==urls.length-1)&&callback();
-	            }
-	        }else{
-	            js.onload=function(){
-	                (i==urls.length-1)&&callback();
-	            }
-	            js.onerror=function(){
-					 (i==urls.length-1)&&callback();
-	            }
-        	}
-
-
-       }
-	}
 	window.DOM=window.DOM||function(seletor,context){
 		if(this instanceof DOM){
 			this.dom=selector(seletor,context);
@@ -254,8 +217,6 @@
 	DOM.each=each;
 	// 模板
 	DOM.template=template;
-	// 动态加载JS
-	DOM.getScript=getScript;
 	/****************************
 	// 拓展共有方法
 	/***************************/

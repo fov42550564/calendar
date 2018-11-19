@@ -371,18 +371,8 @@
 		setDropDown:setDropDown,
 		setFestival:setFestival,
 		getFestival:getFestival,
-		detailHTML:function(y,m,d){
-			// 加载对应的库,然后初始化日历
-			Calendar.loadCalendarLib(y,function(){
-				detailHTML(y,m,d);
-			});
-		},
-		calendarHTML:function(y,m){
-			// 加载对应的库,然后初始化日历
-			Calendar.loadCalendarLib(y,function(){
-				calendarHTML(y,m);
-			});
-		}
+		detailHTML:detailHTML,
+		calendarHTML:calendarHTML
 	}
 
 	// 日历初始化入口函数
