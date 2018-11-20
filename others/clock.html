@@ -1,0 +1,219 @@
+<html>
+<head>
+	<title>时钟</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<div id="clock"></div>
+	<script language="javascript">
+		var el = document.getElementById('clock');
+		var setting = {
+			size: 250,
+			brandText:'SI MIAN TONG',
+			brandText2:'Germany',
+			dialColor:'#000000',
+	        dialBackgroundColor:'transparent',
+	        secondHandColor:'#F3A829',
+	        minuteHandColor:'#222222',
+	        hourHandColor:'#222222',
+	        hourCorrection:'+0',
+			showNumerals:true,
+		};
+	    var canvas = document.createElement('canvas');
+	    var ctx = canvas.getContext('2d');
+
+	    canvas.width = setting.size;
+	    canvas.height = setting.size;
+	    //append canvas to element
+	    el.appendChild(canvas);
+
+	    var radius = parseInt(setting.size/2, 10);
+	    //translate 0,0 to center of circle:
+	    ctx.translate(radius, radius);
+
+	    function toRadians(deg){
+	        return ( Math.PI / 180 ) * deg;
+	    }
+	    function drawDial(color, bgcolor){
+	        var dialRadius = parseInt(radius-(setting.size/50), 10);
+	        var dialBackRadius = radius-(setting.size/400);
+
+	        ctx.beginPath();
+	        ctx.arc(0,0,dialBackRadius,0,360,false);
+	        ctx.fillStyle = bgcolor;
+	        ctx.fill();
+
+	        for (var i=1; i<=60; i+=1) {
+	            var ang=Math.PI/30*i;
+	            var sang=Math.sin(ang);
+	            var cang=Math.cos(ang);
+	            //hour marker/numeral
+	            if (i % 5 === 0) {
+	                ctx.lineWidth = parseInt(setting.size/50,10);
+	                var sx = sang * (dialRadius - dialRadius/9);
+	                var sy = cang * -(dialRadius - dialRadius/9);
+	                var ex = sang * dialRadius;
+	                var ey = cang * - dialRadius;
+	                var nx = sang * (dialRadius - dialRadius/4.2);
+	                var ny = cang * -(dialRadius - dialRadius/4.2);
+	                var text = i/5;
+	                ctx.textBaseline = 'middle';
+	                var textSize = parseInt(setting.size/13,10);
+	                ctx.font = '100 ' + textSize + 'px helvetica';
+	                var textWidth = ctx.measureText (text).width;
+	                ctx.beginPath();
+	                ctx.fillStyle = color;
+
+	                if(setting.showNumerals){
+	                    ctx.fillText(text,nx-(textWidth/2),ny);
+	                }
+	                //minute marker
+	            } else {
+	                ctx.lineWidth = parseInt(setting.size/100,10);
+	                sx = sang * (dialRadius - dialRadius/20);
+	                sy = cang * -(dialRadius - dialRadius/20);
+	                ex = sang * dialRadius;
+	                ey = cang * - dialRadius;
+	            }
+
+	            ctx.beginPath();
+	            ctx.strokeStyle = color;
+	            ctx.lineCap = "round";
+	            ctx.moveTo(sx,sy);
+	            ctx.lineTo(ex,ey);
+	            ctx.stroke();
+	        }
+
+	        if(setting.brandText !== undefined){
+	            ctx.font = '100 ' + parseInt(setting.size/20,10) + 'px helvetica';
+	            var brandtextWidth = ctx.measureText (setting.brandText).width;
+	            ctx.fillText(setting.brandText,-(brandtextWidth/2),(setting.size/6));
+	        }
+
+	        if(setting.brandText2 !== undefined){
+	            ctx.textBaseline = 'middle';
+	            ctx.font = '100 ' + parseInt(setting.size/30,10) + 'px helvetica';
+	            var brandtextWidth2 = ctx.measureText (setting.brandText2).width;
+	            ctx.fillText(setting.brandText2,-(brandtextWidth2/2),(setting.size/4));
+	        }
+
+	    }
+	    function twelvebased(hour){
+	        if(hour >= 12){
+	            hour = hour - 12;
+	        }
+	        return hour;
+	    }
+	    function drawHand(length){
+	        ctx.beginPath();
+	        ctx.moveTo(0,0);
+	        ctx.lineTo(0, length * -1);
+	        ctx.stroke();
+	    }
+	    function drawSecondHand(seconds, color){
+	        var shlength = (radius)-(setting.size/40);
+
+	        ctx.save();
+	        ctx.lineWidth = parseInt(setting.size/150,10);
+	        ctx.lineCap = "round";
+	        ctx.strokeStyle = color;
+	        ctx.rotate( toRadians(seconds * 6));
+
+	        ctx.shadowColor = 'rgba(0,0,0,.5)';
+	        ctx.shadowBlur = parseInt(setting.size/80,10);
+	        ctx.shadowOffsetX = parseInt(setting.size/200,10);
+	        ctx.shadowOffsetY = parseInt(setting.size/200,10);
+
+	        drawHand(shlength);
+
+	        //tail of secondhand
+	        ctx.beginPath();
+	        ctx.moveTo(0,0);
+	        ctx.lineTo(0, shlength/15);
+	        ctx.lineWidth = parseInt(setting.size/30,10);
+	        ctx.stroke();
+
+	        //round center
+	        ctx.beginPath();
+	        ctx.arc(0, 0, parseInt(setting.size/30,10), 0, 360, false);
+	        ctx.fillStyle = color;
+
+	        ctx.fill();
+	        ctx.restore();
+	    }
+	    function drawMinuteHand(minutes, color){
+	        var mhlength = setting.size/2.2;
+	        ctx.save();
+	        ctx.lineWidth = parseInt(setting.size/50,10);
+	        ctx.lineCap = "round";
+	        ctx.strokeStyle = color;
+	        ctx.rotate( toRadians(minutes * 6));
+
+	        ctx.shadowColor = 'rgba(0,0,0,.5)';
+	        ctx.shadowBlur = parseInt(setting.size/50,10);
+	        ctx.shadowOffsetX = parseInt(setting.size/250,10);
+	        ctx.shadowOffsetY = parseInt(setting.size/250,10);
+
+	        drawHand(mhlength);
+	        ctx.restore();
+	    }
+	    function drawHourHand(hours, color){
+	        var hhlength = setting.size/3;
+	        ctx.save();
+	        ctx.lineWidth = parseInt(setting.size/25, 10);
+	        ctx.lineCap = "round";
+	        ctx.strokeStyle = color;
+	        ctx.rotate( toRadians(hours * 30));
+
+	        ctx.shadowColor = 'rgba(0,0,0,.5)';
+	        ctx.shadowBlur = parseInt(setting.size/50, 10);
+	        ctx.shadowOffsetX = parseInt(setting.size/300, 10);
+	        ctx.shadowOffsetY = parseInt(setting.size/300, 10);
+
+	        drawHand(hhlength);
+	        ctx.restore();
+	    }
+	    function timeToDecimal(time){
+	        var h, m;
+	        if(time !== undefined){
+	            h = twelvebased(time.getHours());
+	            m = time.getMinutes();
+	        }
+	        return parseInt(h,10) + (m/60);
+	    }
+	    function numberCorrection(num){
+	        if(num !== '+0' && num !== ''){
+	            if(num.charAt(0) === '+'){
+	                //addNum
+	                return + num.substring(1);
+	            }
+	            else{
+	                //subNum
+	                return - num.substring(1);
+	            }
+	        }
+	        else{
+	            return 0;
+	        }
+	    }
+	    function startClock(){
+	        var now = new Date();
+	        var s = now.getSeconds();
+	        var mins = now.getMinutes();
+	        var m = mins + (s/60);
+	        var hours = now.getHours();
+	        var h = twelvebased(hours + numberCorrection(setting.hourCorrection)) + (m/60);
+	        ctx.clearRect(-radius,-radius,setting.size,setting.size);
+	        drawDial(setting.dialColor, setting.dialBackgroundColor);
+	        drawHourHand(h, setting.hourHandColor);
+	        drawMinuteHand(m, setting.minuteHandColor);
+	        drawSecondHand(s, setting.secondHandColor);
+
+	        var synced_delay= 1000 - ((new Date().getTime()) % 1000);
+	        setTimeout(function(){startClock();},synced_delay);
+	    }
+	    startClock();
+	</script>
+</body>
+</html>
