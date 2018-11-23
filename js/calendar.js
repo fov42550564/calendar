@@ -536,7 +536,6 @@
 			 var num=y-1900+35; //参考干支纪年的计算，生肖对应地支
 			 return chinaZodiac[num%12];
 		}
-		console.log(res);
 		return res;
 	}
 
